@@ -1,4 +1,4 @@
-package com.br.ifba.apoio.empreendimentos.projeto.DTO;
+package com.br.ifba.apoio.empreendimentos.projeto.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

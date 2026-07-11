@@ -2,10 +2,9 @@ package com.br.ifba.apoio.empreendimentos.projeto.controller;
 
 import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
 import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
-import com.br.ifba.apoio.empreendimentos.projeto.DTO.ProjetoRequestDTO;
-import com.br.ifba.apoio.empreendimentos.projeto.DTO.ProjetoResponseDTO;
+import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
+import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoResponseDTO;
 import com.br.ifba.apoio.empreendimentos.projeto.model.Projeto;
-import com.br.ifba.apoio.empreendimentos.projeto.model.StatusProjeto;
 import com.br.ifba.apoio.empreendimentos.projeto.service.ProjetoService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -64,7 +63,7 @@ public class ProjetoController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ProjetoResponseDTO>> listarPorStatus(@PathVariable StatusProjeto status) {
+    public ResponseEntity<List<ProjetoResponseDTO>> listarPorStatus(@PathVariable String status) {
         List<ProjetoResponseDTO> projetos = projetoService.listarPorStatus(status).stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());

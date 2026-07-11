@@ -1,4 +1,4 @@
-package com.br.ifba.apoio.empreendimentos.projeto.DTO;
+package com.br.ifba.apoio.empreendimentos.projeto.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
