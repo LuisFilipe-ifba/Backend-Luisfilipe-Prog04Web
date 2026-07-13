@@ -51,7 +51,7 @@ public class ProjetoService {
         existente.setTitulo(dadosAtualizados.getTitulo());
         existente.setDescricao(dadosAtualizados.getDescricao());
         existente.setValorNecessario(dadosAtualizados.getValorNecessario());
-        existente.setCategorias(dadosAtualizados.getCategorias());
+        existente.setCategoria(dadosAtualizados.getCategoria());
 
         if (dadosAtualizados.getStatus() != null) {
             existente.setStatus(dadosAtualizados.getStatus());

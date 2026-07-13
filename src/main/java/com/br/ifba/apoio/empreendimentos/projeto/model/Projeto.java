@@ -45,11 +45,7 @@ public class Projeto extends PersistenceEntity {
     @Column(updatable = false)
     private LocalDateTime dataCriacao;
 
-    @ManyToMany
-    @JoinTable(
-            name = "projeto_categoria",
-            joinColumns = @JoinColumn(name = "projeto_id"),
-            inverseJoinColumns = @JoinColumn(name = "categoria_id")
-    )
-    private List<Categoria> categorias = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 }

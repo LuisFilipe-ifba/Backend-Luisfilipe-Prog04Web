@@ -2,6 +2,7 @@ package com.br.ifba.apoio.empreendimentos.projeto.controller;
 
 import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
 import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
+import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
 import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
 import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoResponseDTO;
 import com.br.ifba.apoio.empreendimentos.projeto.model.Projeto;
@@ -10,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,31 +26,29 @@ public class ProjetoController {
 
     private final ProjetoService projetoService;
     private final CategoriaRepository categoriaRepository;
+    private final ObjectMapperUtil objectMapperUtil;
 
     @PostMapping("/criador/{criadorId}")
     public ResponseEntity<?> criar(@PathVariable Long criadorId, @Valid @RequestBody ProjetoRequestDTO dto) {
         try {
-            Projeto projeto = toEntity(dto);
+            Projeto projeto = objectMapperUtil.map(dto, Projeto.class);
             Projeto criado = projetoService.criarProjeto(criadorId, projeto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDTO(criado));
+            return ResponseEntity.status(HttpStatus.CREATED).body(objectMapperUtil.map(criado, ProjetoResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @GetMapping
+    @GetMapping(path = "/listarTodos", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjetoResponseDTO>> listarTodos() {
-        List<ProjetoResponseDTO> projetos = projetoService.listarTodos().stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(projetos);
+        return ResponseEntity.status(HttpStatus.OK).body(objectMapperUtil.mapAll(this.projetoService.listarTodos(), ProjetoResponseDTO.class));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
         try {
             Projeto projeto = projetoService.buscarPorId(id);
-            return ResponseEntity.ok(toResponseDTO(projeto));
+            return ResponseEntity.ok(objectMapperUtil.map(projeto, ProjetoResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -56,26 +56,20 @@ public class ProjetoController {
 
     @GetMapping("/criador/{criadorId}")
     public ResponseEntity<List<ProjetoResponseDTO>> listarPorCriador(@PathVariable Long criadorId) {
-        List<ProjetoResponseDTO> projetos = projetoService.listarPorCriador(criadorId).stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(projetos);
+        return ResponseEntity.ok(objectMapperUtil.mapAll(projetoService.listarPorCriador(criadorId), ProjetoResponseDTO.class));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ProjetoResponseDTO>> listarPorStatus(@PathVariable String status) {
-        List<ProjetoResponseDTO> projetos = projetoService.listarPorStatus(status).stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(projetos);
+        return ResponseEntity.ok(objectMapperUtil.mapAll(projetoService.listarPorStatus(status), ProjetoResponseDTO.class));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @Valid @RequestBody ProjetoRequestDTO dto) {
         try {
-            Projeto dadosAtualizados = toEntity(dto);
+            Projeto dadosAtualizados = objectMapperUtil.map(dto, Projeto.class);
             Projeto atualizado = projetoService.atualizarProjeto(id, dadosAtualizados);
-            return ResponseEntity.ok(toResponseDTO(atualizado));
+            return ResponseEntity.ok(objectMapperUtil.map(atualizado, ProjetoResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -89,7 +83,7 @@ public class ProjetoController {
         }
         try {
             Projeto atualizado = projetoService.registrarApoioFinanceiro(id, valor);
-            return ResponseEntity.ok(toResponseDTO(atualizado));
+            return ResponseEntity.ok(objectMapperUtil.map(atualizado, ProjetoResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -104,8 +98,8 @@ public class ProjetoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
+}
+/*
     private Projeto toEntity(ProjetoRequestDTO dto) {
         List<Categoria> categorias = categoriaRepository.findAllById(dto.getCategoriaIds());
 
@@ -133,4 +127,4 @@ public class ProjetoController {
                 nomesCategorias
         );
     }
-}
+}*/

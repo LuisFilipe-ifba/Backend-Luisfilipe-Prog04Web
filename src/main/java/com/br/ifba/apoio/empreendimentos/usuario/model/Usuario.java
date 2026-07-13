@@ -6,13 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import com.br.ifba.apoio.empreendimentos.perfil.model.Perfil;
 
-@EqualsAndHashCode(callSuper = true)
-@Entity
 @Data
-@AllArgsConstructor
-@Table(name = "usuarios")
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "usuarios")
 public class Usuario extends PersistenceEntity {
 
 
@@ -27,5 +27,7 @@ public class Usuario extends PersistenceEntity {
 
     private boolean ativo;
 
-    //private perfil perfilUsuario
+    @ManyToOne
+    @JoinColumn(name = "perfil_id", nullable = false)
+    private Perfil perfil;
 }

@@ -32,7 +32,7 @@ public class ProjetoRequestDTO {
     @Positive(message = "O valor necessário deve ser maior que zero")
     private Double valorNecessario;
 
-    @JsonProperty("categoriaIds")
-    @NotEmpty(message = "O projeto deve ter ao menos uma categoria")
-    private List<Long> categoriaIds;
+    @JsonProperty("categoriaId")
+    @NotNull(message = "A categoria é obrigatória")
+    private Long categoriaId;
 }

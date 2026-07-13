@@ -19,6 +19,5 @@ public class ProjetoResponseDTO {
     private Double valorArrecadado;
     private String status;
     private LocalDateTime dataCriacao;
-    private String nomeCriador;
-    private List<String> categorias;
+    private String categoria;
 }
