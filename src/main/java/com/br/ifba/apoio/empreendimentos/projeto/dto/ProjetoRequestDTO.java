@@ -1,5 +1,6 @@
 package com.br.ifba.apoio.empreendimentos.projeto.dto;
 
+import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -34,5 +35,5 @@ public class ProjetoRequestDTO {
 
     @JsonProperty("categoriaId")
     @NotNull(message = "A categoria é obrigatória")
-    private Long categoriaId;
+    private Categoria categoria;
 }

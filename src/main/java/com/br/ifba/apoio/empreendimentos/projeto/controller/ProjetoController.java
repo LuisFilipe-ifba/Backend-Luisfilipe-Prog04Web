@@ -1,12 +1,10 @@
 package com.br.ifba.apoio.empreendimentos.projeto.controller;
 
-import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
-import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
 import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
 import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
 import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoResponseDTO;
 import com.br.ifba.apoio.empreendimentos.projeto.model.Projeto;
-import com.br.ifba.apoio.empreendimentos.projeto.service.ProjetoService;
+import com.br.ifba.apoio.empreendimentos.projeto.service.ProjetoIService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,23 +14,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projetos")
 @RequiredArgsConstructor
 public class ProjetoController {
 
-    private final ProjetoService projetoService;
-    private final CategoriaRepository categoriaRepository;
+    private final ProjetoIService projetoService;
     private final ObjectMapperUtil objectMapperUtil;
 
     @PostMapping("/criador/{criadorId}")
-    public ResponseEntity<?> criar(@PathVariable Long criadorId, @Valid @RequestBody ProjetoRequestDTO dto) {
+    public ResponseEntity<?> criar(@PathVariable String criadorEmail, @Valid @RequestBody ProjetoRequestDTO dto) {
         try {
             Projeto projeto = objectMapperUtil.map(dto, Projeto.class);
-            Projeto criado = projetoService.criarProjeto(criadorId, projeto);
+            Projeto criado = projetoService.criar(criadorEmail, projeto);
             return ResponseEntity.status(HttpStatus.CREATED).body(objectMapperUtil.map(criado, ProjetoResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -54,9 +49,9 @@ public class ProjetoController {
         }
     }
 
-    @GetMapping("/criador/{criadorId}")
-    public ResponseEntity<List<ProjetoResponseDTO>> listarPorCriador(@PathVariable Long criadorId) {
-        return ResponseEntity.ok(objectMapperUtil.mapAll(projetoService.listarPorCriador(criadorId), ProjetoResponseDTO.class));
+    @GetMapping("/criador/{criadorEmail}")
+    public ResponseEntity<List<ProjetoResponseDTO>> listarPorCriador(@PathVariable String criadorEmail) {
+        return ResponseEntity.ok(objectMapperUtil.mapAll(projetoService.listarPorCriador(criadorEmail), ProjetoResponseDTO.class));
     }
 
     @GetMapping("/status/{status}")
@@ -75,19 +70,7 @@ public class ProjetoController {
         }
     }
 
-    @PatchMapping("/{id}/apoio")
-    public ResponseEntity<?> registrarApoio(@PathVariable Long id, @RequestBody Map<String, Double> body) {
-        Double valor = body.get("valor");
-        if (valor == null || valor <= 0) {
-            return ResponseEntity.badRequest().body("O campo 'valor' deve ser maior que zero.");
-        }
-        try {
-            Projeto atualizado = projetoService.registrarApoioFinanceiro(id, valor);
-            return ResponseEntity.ok(objectMapperUtil.map(atualizado, ProjetoResponseDTO.class));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {

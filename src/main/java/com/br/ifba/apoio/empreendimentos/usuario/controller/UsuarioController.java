@@ -4,7 +4,7 @@ import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
 import com.br.ifba.apoio.empreendimentos.usuario.DTO.UsuarioRequestDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.DTO.UsuarioResponseDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
-import com.br.ifba.apoio.empreendimentos.usuario.service.UsuarioService;
+import com.br.ifba.apoio.empreendimentos.usuario.service.UsuarioIService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioService usuarioService;
+    private final UsuarioIService usuarioService;
     private final ObjectMapperUtil objectMapperUtil;
 
     @PostMapping

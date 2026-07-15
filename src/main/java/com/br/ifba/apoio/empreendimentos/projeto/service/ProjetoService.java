@@ -12,14 +12,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProjetoService {
+public abstract class ProjetoService implements ProjetoIService {
 
     private final ProjetoRepository projetoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public Projeto criarProjeto(Long criadorId, Projeto projeto) {
-        Usuario criador = usuarioRepository.findById(criadorId)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com id: " + criadorId));
+    @Override
+    public Projeto criar(String criadorEmail, Projeto projeto) {
+        Usuario criador = usuarioRepository.findByEmail(criadorEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + criadorEmail));
 
         projeto.setCriador(criador);
         projeto.setValorArrecadado(0.0);
@@ -28,23 +29,30 @@ public class ProjetoService {
         return projetoRepository.save(projeto);
     }
 
+    @Override
     public List<Projeto> listarTodos() {
         return projetoRepository.findAll();
     }
 
+    @Override
     public Projeto buscarPorId(Long id) {
         return projetoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado com id: " + id));
     }
 
-    public List<Projeto> listarPorCriador(Long criadorId) {
-        return projetoRepository.findByCriadorId(criadorId);
+    @Override
+    public List<Projeto> listarPorCriador(String criadorEmail) {
+        Usuario criador = usuarioRepository.findByEmail(criadorEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + criadorEmail));
+        return projetoRepository.findByUsuario(criador);
     }
 
+    @Override
     public List<Projeto> listarPorStatus(String status) {
         return projetoRepository.findByStatus(status);
     }
 
+    @Override
     public Projeto atualizarProjeto(Long id, Projeto dadosAtualizados) {
         Projeto existente = buscarPorId(id);
 
@@ -60,19 +68,12 @@ public class ProjetoService {
         return projetoRepository.save(existente);
     }
 
+    /*
     public Projeto registrarApoioFinanceiro(Long id, Double valorApoio) {
-        Projeto projeto = buscarPorId(id);
+       //ainda não implementado
+    }*/
 
-        double novoValorArrecadado = projeto.getValorArrecadado() + valorApoio;
-        projeto.setValorArrecadado(novoValorArrecadado);
-
-        if (novoValorArrecadado >= projeto.getValorNecessario()) {
-            projeto.setStatus("concluido");
-        }
-
-        return projetoRepository.save(projeto);
-    }
-
+    @Override
     public void deletarProjeto(Long id) {
         Projeto projeto = buscarPorId(id);
         projetoRepository.delete(projeto);

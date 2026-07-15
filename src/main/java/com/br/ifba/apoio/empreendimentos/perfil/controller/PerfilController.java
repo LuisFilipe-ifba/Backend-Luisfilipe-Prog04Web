@@ -4,7 +4,7 @@ import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
 import com.br.ifba.apoio.empreendimentos.perfil.DTO.PerfilRequestDTO;
 import com.br.ifba.apoio.empreendimentos.perfil.DTO.PerfilResponseDTO;
 import com.br.ifba.apoio.empreendimentos.perfil.model.Perfil;
-import com.br.ifba.apoio.empreendimentos.perfil.service.PerfilService;
+import com.br.ifba.apoio.empreendimentos.perfil.service.PerfilIService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PerfilController {
 
-    private final PerfilService perfilService;
+    private final PerfilIService perfilService;
     private final ObjectMapperUtil objectMapperUtil;
 
     @PostMapping

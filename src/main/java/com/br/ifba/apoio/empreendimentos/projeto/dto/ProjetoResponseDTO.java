@@ -1,5 +1,6 @@
 package com.br.ifba.apoio.empreendimentos.projeto.dto;
 
+import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,5 +20,5 @@ public class ProjetoResponseDTO {
     private Double valorArrecadado;
     private String status;
     private LocalDateTime dataCriacao;
-    private String categoria;
+    private Categoria categoria;
 }
