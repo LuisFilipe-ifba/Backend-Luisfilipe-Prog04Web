@@ -1,8 +1,8 @@
 package com.br.ifba.apoio.empreendimentos.usuario.controller;
 
 import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
-import com.br.ifba.apoio.empreendimentos.usuario.DTO.UsuarioRequestDTO;
-import com.br.ifba.apoio.empreendimentos.usuario.DTO.UsuarioResponseDTO;
+import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioRequestDTO;
+import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioResponseDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
 import com.br.ifba.apoio.empreendimentos.usuario.service.UsuarioIService;
 import jakarta.persistence.EntityNotFoundException;

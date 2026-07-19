@@ -4,6 +4,9 @@ import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
 import com.br.ifba.apoio.empreendimentos.usuario.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService implements UsuarioIService {
+public class UsuarioService implements UsuarioIService, UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -67,5 +70,11 @@ public class UsuarioService implements UsuarioIService {
     public void deletar(Long id) {
         Usuario usuario = buscarPorId(id);
         usuarioRepository.delete(usuario);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
     }
 }

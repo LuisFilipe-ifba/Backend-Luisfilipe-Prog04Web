@@ -23,11 +23,7 @@ public class Perfil extends PersistenceEntity {
     @Column(nullable = false, unique = true)
     private String descricao;
 
-    /**
-     * Lista simples de permissões (ex: "PROJETO_CRIAR", "PROJETO_DELETAR").
-     * @ElementCollection guarda isso numa tabela auxiliar "perfil_permissoes",
-     * sem precisar criar uma entidade Permissao separada.
-     */
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "perfil_permissoes", joinColumns = @JoinColumn(name = "perfil_id"))
     @Column(name = "permissao")

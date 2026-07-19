@@ -1,4 +1,4 @@
-package com.br.ifba.apoio.empreendimentos.usuario.DTO;
+package com.br.ifba.apoio.empreendimentos.usuario.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UsuarioResponseDTO {
 
-    private Long id;
     private String nome;
     private String email;
     private boolean ativo;
