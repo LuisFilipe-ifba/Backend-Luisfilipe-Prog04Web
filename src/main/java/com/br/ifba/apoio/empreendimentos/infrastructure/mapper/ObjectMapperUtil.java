@@ -1,8 +1,12 @@
 package com.br.ifba.apoio.empreendimentos.infrastructure.mapper;
 
-
+import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
+import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
 import com.br.ifba.apoio.empreendimentos.perfil.model.Perfil;
 import com.br.ifba.apoio.empreendimentos.perfil.repository.PerfilRepository;
+import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
+import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoResponseDTO;
+import com.br.ifba.apoio.empreendimentos.projeto.model.Projeto;
 import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioRequestDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioResponseDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
@@ -14,14 +18,6 @@ import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
-/*
-import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
-import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoResponseDTO;
-import com.br.ifba.apoio.empreendimentos.projeto.model.Projeto;
-import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
-import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
-*/
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +26,7 @@ import java.util.stream.Collectors;
 public class ObjectMapperUtil {
 
     private final ModelMapper modelMapper = new ModelMapper();
-    //private final CategoriaRepository categoriaRepository;
+    private final CategoriaRepository categoriaRepository;
     private final PerfilRepository perfilRepository;
 
     @jakarta.annotation.PostConstruct
@@ -41,26 +37,25 @@ public class ObjectMapperUtil {
                 .setFieldMatchingEnabled(true)
                 .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
 
-        //configurarMapeamentoProjeto();
+        configurarMapeamentoProjeto();
         configurarMapeamentoUsuario();
     }
 
-
     /**
      * Mapeamentos que o ModelMapper não consegue resolver sozinho por nome/tipo:
-     * - categoriaId (Long) -> categoria (Categoria): precisa consultar o banco.
+     * - categoriaNome (String) -> categoria (Categoria): precisa consultar o banco.
      * - categoria (Categoria) -> categoria (String): mesmo nome, tipo diferente.
-     *//*
+     */
     private void configurarMapeamentoProjeto() {
-        Converter<Long, Categoria> idParaCategoria = ctx ->
+        Converter<String, Categoria> nomeParaCategoria = ctx ->
                 ctx.getSource() == null
                         ? null
-                        : categoriaRepository.findById(ctx.getSource())
-                          .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com id: " + ctx.getSource()));
+                        : categoriaRepository.findByNome(ctx.getSource())
+                          .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada com nome: " + ctx.getSource()));
 
         modelMapper.typeMap(ProjetoRequestDTO.class, Projeto.class)
-                .addMappings(mapper -> mapper.using(idParaCategoria)
-                        .map(ProjetoRequestDTO::getCategoriaId, Projeto::setCategoria));
+                .addMappings(mapper -> mapper.using(nomeParaCategoria)
+                        .map(ProjetoRequestDTO::getCategoriaNome, Projeto::setCategoria));
 
         Converter<Categoria, String> categoriaParaNome = ctx ->
                 ctx.getSource() == null ? null : ctx.getSource().getNome();
@@ -69,7 +64,7 @@ public class ObjectMapperUtil {
                 .addMappings(mapper -> mapper.using(categoriaParaNome)
                         .map(Projeto::getCategoria, ProjetoResponseDTO::setCategoria));
     }
-    */
+
     /**
      * Mapeamentos específicos de Usuario que o ModelMapper não resolve sozinho:
      * - perfilId (Long) -> perfil (Perfil): precisa consultar o banco.
