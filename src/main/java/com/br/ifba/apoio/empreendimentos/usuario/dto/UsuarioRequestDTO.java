@@ -7,6 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Não expõe "id": ele é gerado pelo banco.
+ * "ativo" também não é aceito aqui: todo usuário novo nasce ativo por padrão,
+ * quem desativa é uma ação administrativa separada (fora deste DTO).
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,6 +30,5 @@ public class UsuarioRequestDTO {
     @NotBlank(message = "A senha não pode ser vazia")
     private String senha;
 
-    @NotNull(message = "O perfilId é obrigatório")
     private Long perfilId;
 }

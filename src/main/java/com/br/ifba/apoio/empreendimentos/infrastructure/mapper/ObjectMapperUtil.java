@@ -1,7 +1,11 @@
 package com.br.ifba.apoio.empreendimentos.infrastructure.mapper;
 
+import com.br.ifba.apoio.empreendimentos.apoio.dto.ApoioResponseDTO;
+import com.br.ifba.apoio.empreendimentos.apoio.model.Apoio;
 import com.br.ifba.apoio.empreendimentos.categoria.model.Categoria;
 import com.br.ifba.apoio.empreendimentos.categoria.repository.CategoriaRepository;
+import com.br.ifba.apoio.empreendimentos.mensagem.dto.MensagemResponseDTO;
+import com.br.ifba.apoio.empreendimentos.mensagem.model.Mensagem;
 import com.br.ifba.apoio.empreendimentos.perfil.model.Perfil;
 import com.br.ifba.apoio.empreendimentos.perfil.repository.PerfilRepository;
 import com.br.ifba.apoio.empreendimentos.projeto.dto.ProjetoRequestDTO;
@@ -39,6 +43,8 @@ public class ObjectMapperUtil {
 
         configurarMapeamentoProjeto();
         configurarMapeamentoUsuario();
+        configurarMapeamentoApoio();
+        configurarMapeamentoMensagem();
     }
 
     /**
@@ -87,6 +93,45 @@ public class ObjectMapperUtil {
         modelMapper.typeMap(Usuario.class, UsuarioResponseDTO.class)
                 .addMappings(mapper -> mapper.using(perfilParaDescricao)
                         .map(Usuario::getPerfil, UsuarioResponseDTO::setPerfil));
+    }
+
+    /**
+     * Mapeamentos de Apoio que o ModelMapper não resolve sozinho:
+     * - projeto (Projeto) -> tituloProjeto (String): nome diferente + tipo diferente.
+     * - usuario (Usuario) -> nomeApoiador (String): nome diferente + tipo diferente.
+     */
+    private void configurarMapeamentoApoio() {
+        Converter<Projeto, String> projetoParaTitulo = ctx ->
+                ctx.getSource() == null ? null : ctx.getSource().getTitulo();
+
+        Converter<Usuario, String> usuarioParaNome = ctx ->
+                ctx.getSource() == null ? null : ctx.getSource().getNome();
+
+        modelMapper.typeMap(Apoio.class, ApoioResponseDTO.class)
+                .addMappings(mapper -> {
+                    mapper.using(projetoParaTitulo).map(Apoio::getProjeto, ApoioResponseDTO::setTituloProjeto);
+                    mapper.using(usuarioParaNome).map(Apoio::getUsuario, ApoioResponseDTO::setNomeApoiador);
+                });
+    }
+
+    /**
+     * Mapeamentos de Mensagem que o ModelMapper não resolve sozinho:
+     * - projeto (Projeto) -> tituloProjeto (String): nome diferente + tipo diferente.
+     * - usuario (Usuario) -> nomeAutor (String): nome diferente + tipo diferente.
+     * "id" e "mensagem"/"data" são mapeados automaticamente (mesmo nome/tipo).
+     */
+    private void configurarMapeamentoMensagem() {
+        Converter<Projeto, String> projetoParaTitulo = ctx ->
+                ctx.getSource() == null ? null : ctx.getSource().getTitulo();
+
+        Converter<Usuario, String> usuarioParaNome = ctx ->
+                ctx.getSource() == null ? null : ctx.getSource().getNome();
+
+        modelMapper.typeMap(Mensagem.class, MensagemResponseDTO.class)
+                .addMappings(mapper -> {
+                    mapper.using(projetoParaTitulo).map(Mensagem::getProjeto, MensagemResponseDTO::setTituloProjeto);
+                    mapper.using(usuarioParaNome).map(Mensagem::getUsuario, MensagemResponseDTO::setNomeAutor);
+                });
     }
 
     public <Input, Output> Output map(final Input object, final Class<Output> clazz) {

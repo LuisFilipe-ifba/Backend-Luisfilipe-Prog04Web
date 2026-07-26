@@ -3,8 +3,9 @@ package com.br.ifba.apoio.empreendimentos.usuario.controller;
 import com.br.ifba.apoio.empreendimentos.infrastructure.mapper.ObjectMapperUtil;
 import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioRequestDTO;
 import com.br.ifba.apoio.empreendimentos.usuario.dto.UsuarioResponseDTO;
+import com.br.ifba.apoio.empreendimentos.infrastructure.exeption.EmailJaCadastradoException;
 import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
-import com.br.ifba.apoio.empreendimentos.usuario.service.UsuarioIService;
+import com.br.ifba.apoio.empreendimentos.usuario.service.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +20,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioIService usuarioService;
+    private final UsuarioService usuarioService;
     private final ObjectMapperUtil objectMapperUtil;
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> criar(@Valid @RequestBody UsuarioRequestDTO dto) {
-        Usuario usuario = objectMapperUtil.map(dto, Usuario.class);
-        Usuario criado = usuarioService.criar(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(objectMapperUtil.map(criado, UsuarioResponseDTO.class));
+    public ResponseEntity<?> criar(@Valid @RequestBody UsuarioRequestDTO dto) {
+        try {
+            Usuario usuario = objectMapperUtil.map(dto, Usuario.class);
+            Usuario criado = usuarioService.criarUsuario(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(objectMapperUtil.map(criado, UsuarioResponseDTO.class));
+        } catch (EmailJaCadastradoException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(objectMapperUtil.mapAll(usuarioService.listar(), UsuarioResponseDTO.class));
+        return ResponseEntity.ok(objectMapperUtil.mapAll(usuarioService.listarTodos(), UsuarioResponseDTO.class));
     }
 
     @GetMapping("/{id}")
@@ -48,7 +55,7 @@ public class UsuarioController {
     public ResponseEntity<?> atualizar(@PathVariable Long id, @Valid @RequestBody UsuarioRequestDTO dto) {
         try {
             Usuario dadosAtualizados = objectMapperUtil.map(dto, Usuario.class);
-            Usuario atualizado = usuarioService.atualizar(id, dadosAtualizados);
+            Usuario atualizado = usuarioService.atualizarUsuario(id, dadosAtualizados);
             return ResponseEntity.ok(objectMapperUtil.map(atualizado, UsuarioResponseDTO.class));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -58,7 +65,7 @@ public class UsuarioController {
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<?> desativar(@PathVariable Long id) {
         try {
-            usuarioService.desativar(id);
+            usuarioService.desativarUsuario(id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -68,7 +75,7 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletar(@PathVariable Long id) {
         try {
-            usuarioService.deletar(id);
+            usuarioService.deletarUsuario(id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

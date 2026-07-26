@@ -1,12 +1,12 @@
 package com.br.ifba.apoio.empreendimentos.usuario.service;
 
+import com.br.ifba.apoio.empreendimentos.perfil.model.Perfil;
+import com.br.ifba.apoio.empreendimentos.perfil.repository.PerfilRepository;
+import com.br.ifba.apoio.empreendimentos.infrastructure.exeption.EmailJaCadastradoException;
 import com.br.ifba.apoio.empreendimentos.usuario.model.Usuario;
 import com.br.ifba.apoio.empreendimentos.usuario.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,37 +14,45 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioService implements UsuarioIService, UserDetailsService {
+public class UsuarioService {
+
+
+    private static final String PERFIL_PADRAO = "APOIADOR";
 
     private final UsuarioRepository usuarioRepository;
+    private final PerfilRepository perfilRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public Usuario criar(Usuario usuario) {
+    public Usuario criarUsuario(Usuario usuario) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+            throw new EmailJaCadastradoException(usuario.getEmail());
+        }
+
+        if (usuario.getPerfil() == null) {
+            usuario.setPerfil(buscarPerfilPadrao());
+        }
+
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         usuario.setAtivo(true);
         return usuarioRepository.save(usuario);
     }
 
-    @Override
-    public List<Usuario> listar() {
+    private Perfil buscarPerfilPadrao() {
+        return perfilRepository.findByDescricao(PERFIL_PADRAO)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Perfil padrão '" + PERFIL_PADRAO + "' não encontrado. Verifique o DataInitializer."));
+    }
+
+    public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
-    @Override
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com id: " + id));
     }
 
-    @Override
-    public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + email));
-    }
-
-    @Override
-    public Usuario atualizar(Long id, Usuario dadosAtualizados) {
+    public Usuario atualizarUsuario(Long id, Usuario dadosAtualizados) {
         Usuario existente = buscarPorId(id);
 
         existente.setNome(dadosAtualizados.getNome());
@@ -59,22 +67,14 @@ public class UsuarioService implements UsuarioIService, UserDetailsService {
         return usuarioRepository.save(existente);
     }
 
-    @Override
-    public void desativar(Long id) {
+    public void desativarUsuario(Long id) {
         Usuario usuario = buscarPorId(id);
         usuario.setAtivo(false);
         usuarioRepository.save(usuario);
     }
 
-    @Override
-    public void deletar(Long id) {
+    public void deletarUsuario(Long id) {
         Usuario usuario = buscarPorId(id);
         usuarioRepository.delete(usuario);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
     }
 }

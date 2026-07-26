@@ -24,12 +24,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> {})
                 // JWT é stateless: cada requisição se autentica sozinha, sem sessão de servidor guardada.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/projetos/**", "/api/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/projetos/**", "/api/categorias/**", "/api/apoios/projeto/**", "/api/mensagens/projeto/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

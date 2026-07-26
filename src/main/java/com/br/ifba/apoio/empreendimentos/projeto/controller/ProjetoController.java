@@ -18,7 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projetos")
@@ -28,11 +27,6 @@ public class ProjetoController {
     private final ProjetoService projetoService;
     private final ObjectMapperUtil objectMapperUtil;
 
-    /**
-     * "criadorId" não existe mais aqui: o Spring Security injeta o Usuario
-     * autenticado (resolvido pelo JwtAuthenticationFilter a partir do token)
-     * automaticamente via @AuthenticationPrincipal.
-     */
     @PostMapping
     public ResponseEntity<?> criar(@AuthenticationPrincipal Usuario usuarioLogado,
                                    @Valid @RequestBody ProjetoRequestDTO dto) {
@@ -78,24 +72,6 @@ public class ProjetoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
-    }
-
-    /**
-     * Apoiar um projeto continua sem checagem de propriedade: qualquer
-     * usuário autenticado pode apoiar, não só o criador.
-     */
-    @PatchMapping("/{id}/apoio")
-    public ResponseEntity<?> registrarApoio(@PathVariable Long id, @RequestBody Map<String, Double> body) {
-        Double valor = body.get("valor");
-        if (valor == null || valor <= 0) {
-            return ResponseEntity.badRequest().body("O campo 'valor' deve ser maior que zero.");
-        }
-        try {
-            Projeto atualizado = projetoService.registrarApoioFinanceiro(id, valor);
-            return ResponseEntity.ok(objectMapperUtil.map(atualizado, ProjetoResponseDTO.class));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

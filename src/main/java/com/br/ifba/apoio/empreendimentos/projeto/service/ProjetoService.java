@@ -17,11 +17,7 @@ public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;
 
-    /**
-     * "criador" já vem pronto do controller (extraído do token JWT via
-     * @AuthenticationPrincipal), então não precisamos mais buscar o
-     * usuário pelo id aqui — nem confiar num id vindo de fora.
-     */
+
     public Projeto criarProjeto(Usuario criador, Projeto projeto) {
         projeto.setCriador(criador);
         projeto.setValorArrecadado(0.0);
@@ -56,21 +52,6 @@ public class ProjetoService {
         existente.setCategoria(dadosAtualizados.getCategoria());
 
         return projetoRepository.save(existente);
-    }
-
-    public Projeto registrarApoioFinanceiro(Long id, Double valorApoio) {
-        // Sem verificação de propriedade de propósito: apoiar é uma ação
-        // de QUALQUER usuário autenticado, não só do criador do projeto.
-        Projeto projeto = buscarPorId(id);
-
-        double novoValorArrecadado = projeto.getValorArrecadado() + valorApoio;
-        projeto.setValorArrecadado(novoValorArrecadado);
-
-        if (novoValorArrecadado >= projeto.getValorNecessario()) {
-            projeto.setStatus(StatusProjeto.FINANCIADO);
-        }
-
-        return projetoRepository.save(projeto);
     }
 
     public void deletarProjeto(Long id, Usuario usuarioAutenticado) {

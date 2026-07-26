@@ -44,7 +44,7 @@ public class Projeto extends PersistenceEntity {
     @Column(updatable = false)
     private LocalDateTime dataCriacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 }
