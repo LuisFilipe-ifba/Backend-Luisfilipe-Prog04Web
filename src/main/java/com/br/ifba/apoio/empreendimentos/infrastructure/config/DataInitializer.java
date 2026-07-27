@@ -28,7 +28,7 @@ public class DataInitializer implements CommandLineRunner {
         if (perfilRepository.findByDescricao("APOIADOR").isEmpty()) {
             Perfil apoiador = new Perfil();
             apoiador.setDescricao("APOIADOR");
-            apoiador.setPermissoes(List.of("PROJETO_APOIAR", "MENSAGEM_CRIAR"));
+            apoiador.setPermissoes(List.of("PROJETO_APOIAR", "MENSAGEM_CRIAR, PROJETO_CRIAR"));
             perfilRepository.save(apoiador);
         }
     }
