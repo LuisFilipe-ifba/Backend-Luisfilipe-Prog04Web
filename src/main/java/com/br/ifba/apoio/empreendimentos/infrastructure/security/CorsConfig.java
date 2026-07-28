@@ -23,7 +23,8 @@ public class CorsConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://frontend-prog04-web.vercel.app"
+                "https://frontend-prog04-web.vercel.app",
+                "https://impulso-br.vercel.app/"
         ));
 
         configuration.setAllowedMethods(List.of(
